@@ -16,9 +16,10 @@ NC='\033[0m' # No Color
 
 # Check if repository exists
 REPO_URL="https://github.com/coolmg/uigen"
-if ! curl -s --head "$REPO_URL" | head -n 1 | grep -q "200 OK"; then
-    echo -e "${RED}❌ Repository not found at $REPO_URL${NC}"
-    echo -e "${YELLOW}Please create the repository first and push your code.${NC}"
+HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$REPO_URL")
+if [ "$HTTP_STATUS" != "200" ]; then
+    echo -e "${RED}❌ Repository not accessible at $REPO_URL (HTTP $HTTP_STATUS)${NC}"
+    echo -e "${YELLOW}Please ensure the repository exists and is accessible.${NC}"
     exit 1
 fi
 
