@@ -7,9 +7,9 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 10
     reviewers:
-      - "mg665826"
+      - "coolmg"
     assignees:
-      - "mg665826"
+      - "coolmg"
     commit-message:
       prefix: "chore"
       include: "scope"
