@@ -288,25 +288,44 @@ const Card = ({
   title = "Welcome to Our Service", 
   description = "Discover amazing features and capabilities that will transform your experience.",
   imageUrl,
-  actions 
+  actions,
+  badge
 }) => {
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
+    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300 group">
       {imageUrl && (
-        <img 
-          src={imageUrl} 
-          alt={title}
-          className="w-full h-48 object-cover"
-        />
+        <div className="aspect-video overflow-hidden">
+          <img 
+            src={imageUrl} 
+            alt={title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+        </div>
       )}
       <div className="p-6">
-        <h3 className="text-xl font-semibold mb-2">{title}</h3>
-        <p className="text-gray-600 mb-4">{description}</p>
-        {actions && (
-          <div className="mt-4">
+        <div className="flex items-start justify-between mb-3">
+          <h3 className="text-xl font-semibold text-slate-900 leading-tight">{title}</h3>
+          {badge && (
+            <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+              {badge}
+            </span>
+          )}
+        </div>
+        <p className="text-slate-600 mb-6 leading-relaxed">{description}</p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+              <span className="text-white text-sm font-medium">A</span>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-900">Author Name</p>
+              <p className="text-xs text-slate-500">2 hours ago</p>
+            </div>
+          </div>
+          <div className="flex gap-2">
             {actions}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
@@ -361,6 +380,113 @@ const Counter = () => {
 };
 
 export default Counter;`;
+
+      case "button":
+        return `import React, { useState } from 'react';
+
+const ButtonShowcase = () => {
+  const [loading, setLoading] = useState(false);
+  const [clicked, setClicked] = useState(false);
+
+  const handleClick = () => {
+    setClicked(true);
+    setTimeout(() => setClicked(false), 2000);
+  };
+
+  const handleAsyncAction = async () => {
+    setLoading(true);
+    // Simulate async operation
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    setLoading(false);
+  };
+
+  return (
+    <div className="p-8 space-y-6 bg-white rounded-xl shadow-sm border border-slate-200">
+      <div className="text-center mb-8">
+        <h2 className="text-2xl font-bold text-slate-900 mb-2">Button Components</h2>
+        <p className="text-slate-600">Modern, accessible button variants with interactive states</p>
+      </div>
+      
+      <div className="grid gap-4">
+        {/* Primary Buttons */}
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">Primary Actions</h3>
+          <div className="flex flex-wrap gap-3">
+            <button 
+              onClick={handleClick}
+              className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-sm"
+            >
+              {clicked ? '✓ Clicked!' : 'Primary Button'}
+            </button>
+            
+            <button 
+              onClick={handleAsyncAction}
+              disabled={loading}
+              className="px-6 py-3 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+            >
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Loading...
+                </div>
+              ) : (
+                'Async Action'
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Secondary Buttons */}
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">Secondary Actions</h3>
+          <div className="flex flex-wrap gap-3">
+            <button className="px-6 py-3 bg-slate-100 text-slate-700 font-medium rounded-lg hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 transition-all duration-200 border border-slate-300">
+              Secondary
+            </button>
+            
+            <button className="px-6 py-3 text-blue-600 font-medium rounded-lg hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 border border-blue-200">
+              Ghost Button
+            </button>
+          </div>
+        </div>
+
+        {/* Danger/Warning */}
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">Status Actions</h3>
+          <div className="flex flex-wrap gap-3">
+            <button className="px-6 py-3 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200 shadow-sm">
+              Delete
+            </button>
+            
+            <button className="px-6 py-3 bg-amber-600 text-white font-medium rounded-lg hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition-all duration-200 shadow-sm">
+              Warning
+            </button>
+          </div>
+        </div>
+
+        {/* Sizes */}
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">Button Sizes</h3>
+          <div className="flex flex-wrap items-center gap-3">
+            <button className="px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200">
+              Small
+            </button>
+            
+            <button className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200">
+              Medium
+            </button>
+            
+            <button className="px-8 py-4 bg-blue-600 text-white text-lg font-medium rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200">
+              Large
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ButtonShowcase;`;
     }
   }
 
@@ -370,6 +496,8 @@ export default Counter;`;
         return "    console.log('Form submitted:', formData);";
       case "card":
         return '      <div className="p-6">';
+      case "button":
+        return 'className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg';
       default:
         return "  const increment = () => setCount(count + 1);";
     }
@@ -380,7 +508,9 @@ export default Counter;`;
       case "form":
         return "    console.log('Form submitted:', formData);\n    alert('Thank you! We\\'ll get back to you soon.');";
       case "card":
-        return '      <div className="p-6 hover:bg-gray-50 transition-colors">';
+        return '      <div className="p-6 hover:bg-slate-50 transition-colors">';
+      case "button":
+        return 'className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-lg shadow-md';
       default:
         return "  const increment = () => setCount(prev => prev + 1);";
     }
@@ -392,15 +522,22 @@ export default Counter;`;
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-8">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-8">
+      <div className="w-full max-w-lg">
         <Card 
-          title="Amazing Product"
-          description="This is a fantastic product that will change your life. Experience the difference today!"
+          title="Amazing Product Launch"
+          description="Experience the next generation of innovation with our cutting-edge product. Designed for modern users who demand excellence and reliability."
+          badge="New"
+          imageUrl="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=600&h=400&fit=crop"
           actions={
-            <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors">
-              Learn More
-            </button>
+            <>
+              <button className="px-4 py-2 text-slate-600 hover:text-slate-900 transition-colors">
+                Learn More
+              </button>
+              <button className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 shadow-sm">
+                Get Started
+              </button>
+            </>
           }
         />
       </div>

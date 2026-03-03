@@ -55,6 +55,8 @@ Open [http://localhost:3000](http://localhost:3000)
 - Syntax highlighting and code editor
 - Component persistence for registered users
 - Export generated code
+- End-to-end testing with Playwright
+- AI-assisted browser automation via MCP (Model Context Protocol)
 
 ## Tech Stack
 
@@ -65,3 +67,26 @@ Open [http://localhost:3000](http://localhost:3000)
 - Prisma with SQLite
 - Anthropic Claude AI
 - Vercel AI SDK
+- Playwright (E2E Testing)
+- Playwright MCP (AI Browser Automation)
+
+## Testing
+
+### Unit Tests
+```bash
+npm test                    # Run unit tests with Vitest
+```
+
+### End-to-End Tests
+```bash
+npm run test:e2e           # Run E2E tests
+npm run test:e2e:ui        # Run E2E tests with interactive UI
+npm run test:e2e:headed    # Run E2E tests in headed mode
+```
+
+### AI-Assisted Testing
+```bash
+npm run mcp:start          # Start MCP server for AI browser automation
+```
+
+See [MCP_SETUP.md](./MCP_SETUP.md) for detailed information about AI-assisted browser automation.

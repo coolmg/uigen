@@ -60,7 +60,24 @@ afterEach(() => {
   cleanup();
 });
 
-test("renders chat interface with message list and input", () => {
+test("renders chat interface with empty state and input when no messages", () => {
+  render(<ChatInterface />);
+
+  // Should show empty state, not message list
+  expect(screen.getByText("Start a conversation to generate React components")).toBeDefined();
+  expect(screen.getByTestId("message-input")).toBeDefined();
+});
+
+test("renders chat interface with message list and input when messages exist", () => {
+  const messages = [
+    { id: "1", role: "user", content: "Hello" },
+  ];
+  
+  (useChat as any).mockReturnValue({
+    ...mockUseChat,
+    messages,
+  });
+
   render(<ChatInterface />);
 
   expect(screen.getByTestId("message-list")).toBeDefined();
@@ -138,9 +155,20 @@ test("isLoading is false when status is idle", () => {
 
 
 test("scrolls when messages change", () => {
+  // Start with messages so MessageList is rendered
+  const messages = [
+    { id: "1", role: "user", content: "Hello" },
+    { id: "2", role: "assistant", content: "Hi there!" },
+  ];
+
+  (useChat as any).mockReturnValue({
+    ...mockUseChat,
+    messages,
+  });
+
   const { rerender } = render(<ChatInterface />);
 
-  // Get initial scroll container
+  // Get scroll container - should exist when there are messages
   const scrollContainer = screen.getByTestId("message-list").closest("[data-radix-scroll-area-viewport]");
   expect(scrollContainer).toBeDefined();
 
@@ -148,8 +176,8 @@ test("scrolls when messages change", () => {
   (useChat as any).mockReturnValue({
     ...mockUseChat,
     messages: [
-      { id: "1", role: "user", content: "Hello" },
-      { id: "2", role: "assistant", content: "Hi there!" },
+      ...messages,
+      { id: "3", role: "user", content: "Another message" },
     ],
   });
 
@@ -157,7 +185,7 @@ test("scrolls when messages change", () => {
 
   // Verify component re-rendered with new messages
   const messageList = screen.getByTestId("message-list");
-  expect(messageList.textContent).toContain("2 messages");
+  expect(messageList.textContent).toContain("3 messages");
 });
 
 test("renders with correct layout classes", () => {
@@ -170,6 +198,37 @@ test("renders with correct layout classes", () => {
   expect(mainDiv.className).toContain("p-4");
   expect(mainDiv.className).toContain("overflow-hidden");
 
+  // When no messages, should show empty state with flex-1 class
+  const emptyState = container.querySelector(".flex-1");
+  expect(emptyState?.className).toContain("flex-1");
+  expect(emptyState?.className).toContain("flex");
+  expect(emptyState?.className).toContain("flex-col");
+
+  const inputWrapper = screen.getByTestId("message-input").parentElement;
+  expect(inputWrapper?.className).toContain("mt-4");
+  expect(inputWrapper?.className).toContain("flex-shrink-0");
+});
+
+test("renders with correct layout classes when messages exist", () => {
+  const messages = [
+    { id: "1", role: "user", content: "Hello" },
+  ];
+  
+  (useChat as any).mockReturnValue({
+    ...mockUseChat,
+    messages,
+  });
+
+  const { container } = render(<ChatInterface />);
+
+  const mainDiv = container.firstChild as HTMLElement;
+  expect(mainDiv.className).toContain("flex");
+  expect(mainDiv.className).toContain("flex-col");
+  expect(mainDiv.className).toContain("h-full");
+  expect(mainDiv.className).toContain("p-4");
+  expect(mainDiv.className).toContain("overflow-hidden");
+
+  // When messages exist, should show ScrollArea with flex-1 class
   const scrollArea = screen.getByTestId("message-list").closest(".flex-1");
   expect(scrollArea?.className).toContain("overflow-hidden");
 

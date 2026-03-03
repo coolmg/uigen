@@ -8,19 +8,22 @@ vi.mock("../MarkdownRenderer", () => ({
   MarkdownRenderer: ({ content }: { content: string }) => <div>{content}</div>,
 }));
 
+// Mock the ToolCallDisplay component
+vi.mock("../ToolCallDisplay", () => ({
+  ToolCallDisplay: ({ toolInvocation }: { toolInvocation: any }) => (
+    <div data-testid="tool-call-display">{toolInvocation.toolName}</div>
+  ),
+}));
+
 afterEach(() => {
   cleanup();
 });
 
-test("MessageList shows empty state when no messages", () => {
-  render(<MessageList messages={[]} />);
+test("MessageList returns null when no messages", () => {
+  const { container } = render(<MessageList messages={[]} />);
 
-  expect(
-    screen.getByText("Start a conversation to generate React components")
-  ).toBeDefined();
-  expect(
-    screen.getByText("I can help you create buttons, forms, cards, and more")
-  ).toBeDefined();
+  // MessageList should return null for empty messages (empty state is handled by ChatInterface)
+  expect(container.firstChild).toBeNull();
 });
 
 test("MessageList renders user messages", () => {
@@ -265,6 +268,117 @@ test("MessageList handles empty content with parts", () => {
   render(<MessageList messages={messages} />);
 
   expect(screen.getByText("This is from parts")).toBeDefined();
+});
+
+test("MessageList renders tool invocation with realistic str_replace_editor args", () => {
+  const messages: Message[] = [
+    {
+      id: "1",
+      role: "assistant",
+      content: "",
+      parts: [
+        { type: "text", text: "I'll create a component for you." },
+        {
+          type: "tool-invocation",
+          toolInvocation: {
+            toolCallId: "call_1",
+            args: {
+              command: "create",
+              path: "/App.jsx",
+              file_text: "export default function App() { return <div>Hello</div>; }"
+            },
+            toolName: "str_replace_editor",
+            state: "result",
+            result: "File created successfully",
+          },
+        },
+      ],
+    },
+  ];
+
+  render(<MessageList messages={messages} />);
+
+  expect(screen.getByText("I'll create a component for you.")).toBeDefined();
+  expect(screen.getByTestId("tool-call-display")).toBeDefined();
+});
+
+test("MessageList renders tool invocation with realistic file_manager args", () => {
+  const messages: Message[] = [
+    {
+      id: "1",
+      role: "assistant",
+      content: "",
+      parts: [
+        { type: "text", text: "Let me rename that file." },
+        {
+          type: "tool-invocation",
+          toolInvocation: {
+            toolCallId: "call_2",
+            args: {
+              command: "rename",
+              path: "/old-component.jsx",
+              new_path: "/NewComponent.jsx"
+            },
+            toolName: "file_manager",
+            state: "result",
+            result: { success: true, message: "File renamed successfully" },
+          },
+        },
+      ],
+    },
+  ];
+
+  render(<MessageList messages={messages} />);
+
+  expect(screen.getByText("Let me rename that file.")).toBeDefined();
+  expect(screen.getByTestId("tool-call-display")).toBeDefined();
+});
+
+test("MessageList renders multiple tool invocations", () => {
+  const messages: Message[] = [
+    {
+      id: "1",
+      role: "assistant",
+      content: "",
+      parts: [
+        { type: "text", text: "Creating multiple files..." },
+        {
+          type: "tool-invocation",
+          toolInvocation: {
+            toolCallId: "call_1",
+            args: {
+              command: "create",
+              path: "/App.jsx",
+              file_text: "export default function App() { return <div>App</div>; }"
+            },
+            toolName: "str_replace_editor",
+            state: "result",
+            result: "File created successfully",
+          },
+        },
+        {
+          type: "tool-invocation",
+          toolInvocation: {
+            toolCallId: "call_2",
+            args: {
+              command: "create",
+              path: "/components/Button.jsx",
+              file_text: "export default function Button() { return <button>Click me</button>; }"
+            },
+            toolName: "str_replace_editor",
+            state: "result",
+            result: "File created successfully",
+          },
+        },
+      ],
+    },
+  ];
+
+  render(<MessageList messages={messages} />);
+
+  expect(screen.getByText("Creating multiple files...")).toBeDefined();
+  const toolDisplays = screen.getAllByTestId("tool-call-display");
+  expect(toolDisplays).toHaveLength(2);
 });
 
 test("MessageList shows loading for assistant message with empty parts", () => {
